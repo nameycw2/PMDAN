@@ -1,5 +1,3 @@
-# Dilated feature distillation attention network for efficient image super-resolution (DFDAN)
-
 ## Environment in our experiments
 [python 3.8]
 
@@ -11,7 +9,7 @@
 
 ### Installation
 ```
-git clone https://github.com/Supereeeee/DFDAN.git
+git clone https://github.com/nameycw2/PMDAN.git
 pip install -r requirements.txt
 python setup.py develop
 ```
@@ -19,14 +17,12 @@ python setup.py develop
 ## How To Test
 · Refer to ./options/test for the configuration file of the model to be tested and prepare the testing data.
 
-· The pre-trained models have been palced in ./experiments/pretrained_models/
-
 · Then run the follwing codes for testing:
 
 ```
-python basicsr/test.py -opt options/test/test_DFDAN_x2.yml
-python basicsr/test.py -opt options/test/test_DFDAN_x3.yml
-python basicsr/test.py -opt options/test/test_DFDAN_x4.yml
+python basicsr/test.py -opt options/test/test_PMDAN_x2.yml
+python basicsr/test.py -opt options/test/test_PMDAN_x3.yml
+python basicsr/test.py -opt options/test/test_PMDAN_x4.yml
 ```
 The testing results will be saved in the ./results folder.
 
@@ -39,21 +35,16 @@ The testing results will be saved in the ./results folder.
 
 · The training command is like following:
 ```
-python basicsr/train.py -opt options/train/train_DFDAN_x2.yml
-python basicsr/train.py -opt options/train/train_DFDAN_x3.yml
-python basicsr/train.py -opt options/train/train_DFDAN_x4.yml
+python basicsr/train.py -opt options/train/train_PMDAN_x2.yml
+python basicsr/train.py -opt options/train/train_PMDAN_x3.yml
+python basicsr/train.py -opt options/train/train_PMDAN_x4.yml
 ```
 For more training commands and details, please check the docs in [BasicSR](https://github.com/XPixelGroup/BasicSR)
 
 ## Model Complexity
-· The network structure of DFDAN is palced at ./basicsr/archs/DFDAN_arch.py
+· The network structure of PMDAN is palced at ./basicsr/archs/PMDAN_arch.py
 
 · We adopt thop tool to calculate model complexity, see ./basicsr/archs/model_complexity.py
-
-## Inference time
-· We test the inference time on multiple benchmark datasets on a 140W fully powered 3060 laptop.
-
-· You can run ./inference/inference_DFDAN.py on your decive.
 
 
 ## Acknowledgement

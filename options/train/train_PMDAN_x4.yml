@@ -4,8 +4,7 @@ model_type: SRModel
 scale: 4
 num_gpu: 1  # set num_gpu: 0 for cpu mode
 manual_seed: 0
-# python basicsr/train.py -opt options/train/train_DFDAN_x2.yml --auto_resume  python basicsr/train.py -opt options/train/train_PMDAN_conv_x4.yml
-# dataset and data loader settings
+
 datasets:
   train:
     name: DF2K
@@ -13,7 +12,7 @@ datasets:
     #dataroot_gt: datasets/DIV2K/DIV2K_train_HR_sub
     #dataroot_lq: datasets/DIV2K/DIV2K_train_LR_bicubic/X4_sub
     # (for lmdb)
-    dataroot_gt:  /home/user2/ycw/data/train_data/DF2K_sub/HR #datasets/DF2K_sub/HR # /home/user2/ycw/code/MSDAN-master/datasets/DF2K_sub/HR.lmdb 
+    dataroot_gt:  /home/user2/ycw/data/train_data/DF2K_sub/HR #datasets/DF2K_sub/HR # /home/user2/ycw/code/MSDAN-master/datasets/DF2K_sub/HR.lmdb
     dataroot_lq:  /home/user2/ycw/data/train_data/DF2K_sub/LR_bicubic/LRx4 #datasets/DF2K_sub/LR_bicubic/X4 # /home/user2/ycw/code/MSDAN-master/datasets/DF2K_sub/LR_bicubic_X4.lmdb #
     filename_tmpl: '{}'
     io_backend:
@@ -31,12 +30,12 @@ datasets:
     dataset_enlarge_ratio: 10
     prefetch_mode: cuda
     pin_memory: true
- 
+
   val:
     name: Set5
-    type: PairedImageDataset    
+    type: PairedImageDataset
     dataroot_gt: /home/user2/ycw/data/test_data/set5/mod4/GT # datasets/benchmark/Set5/mod2/GT
-    dataroot_lq: /home/user2/ycw/data/test_data/set5/mod4/LRx4 # datasets/benchmark/Set5/mod2/LRX2  
+    dataroot_lq: /home/user2/ycw/data/test_data/set5/mod4/LRx4 # datasets/benchmark/Set5/mod2/LRX2
     io_backend:
       type: disk
 
@@ -51,9 +50,9 @@ network_g:
 
 # path
 path:
-  pretrain_network_g: ~ #/home/user2/ycw/code/DFDAN-master/experiments/DFDAN_yuanban_8_8_10_guangfangceshiji/models/net_g_430000.pth
+  pretrain_network_g: ~
   strict_load_g: true
-  resume_state: ~ #/home/user2/ycw/code/DFDAN-master/experiments/DFDAN_yuanban_8_8_10_guangfangceshiji/models/net_g_430000.pth
+  resume_state: ~
 
 # training settings
 train:
