@@ -1,0 +1,129 @@
+# GENERATE TIME: 2025-12-08
+# CMD: basicsr/train.py -opt options/train/train_PMDAN_conv_x4_SA_Safe.yml
+# 任务: 消融实验 (Spatial Attention) - 1070Ti 稳定版协议
+
+# general settings
+name: PMDAN_SMDA_only_x4_safe
+model_type: SRModel
+scale: 4
+num_gpu: 1
+manual_seed: 0
+
+# dataset and data loader settings
+datasets:
+  train:
+    name: DF2K
+    type: PairedImageDataset
+    # 路径保持不变
+    dataroot_gt: /home/user2/ycw/data/train_data/DF2K_sub/HR
+    dataroot_lq: /home/user2/ycw/data/train_data/DF2K_sub/LR_bicubic/LRx4
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+    gt_size: 256
+    use_hflip: true
+    use_rot: true
+
+    # data loader
+    num_worker_per_gpu: 8
+    # 【协议 1】1070Ti 必须保持 16，切勿改动
+    batch_size_per_gpu: 16
+    dataset_enlarge_ratio: 10
+    prefetch_mode: cuda
+    pin_memory: true
+
+  val:
+    name: Set5
+    type: PairedImageDataset
+    dataroot_gt: /home/user2/ycw/data/test_data/set5/mod4/GT
+    dataroot_lq: /home/user2/ycw/data/test_data/set5/mod4/LRx4
+    io_backend:
+      type: disk
+
+# network structures
+network_g:
+  # 确保你的代码里 network 名字对应的是 SA 版本
+  type: PMDAN_conv 
+  in_channels: 3
+  num_feat: 56
+  num_block: 8
+  out_channels: 3
+  upscale: 4
+  # 如果你的代码通过参数控制注意力类型，请在这里添加，例如:
+  # attention_type: 'SMDA' 
+
+# path
+path:
+  # 【协议 2】消融实验统一从头训练 (From Scratch)
+  pretrain_network_g: ~
+  strict_load_g: true
+  resume_state: ~
+
+# training settings
+train:
+  # 【协议 3】梯度累积：物理16 * 2 = 等效32
+  accumulate_grad: 2
+  # 【协议 4】混合精度：节省 1070Ti 显存
+  use_amp: true
+  
+  # 【协议 5 - 关键防炸】必须加上梯度裁剪！
+  # 哪怕是 SA 这种简单的模块，加了它也能跑得更稳，分数更高
+  grad_clip: 0.5
+
+  ema_decay: 0.999
+  optim_g:
+    type: Adam
+    # 【协议 6 - 关键统一】所有消融实验统一使用 5e-4
+    # 这能保证 CA/ESA 不会炸，且 Baseline/SMDA 也能收敛得更细腻
+    lr: !!float 5e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+
+  scheduler:
+    type: CosineAnnealingRestartLR
+    periods: [1000000]
+    restart_weights: [1]
+    # 【协议 7】配合 5e-4 的初始值，最低值设为 1e-7
+    eta_min: !!float 1e-7
+
+  total_iter: 1000000
+  # 【协议 8】统一增加 Warmup，防止起步阶段梯度波动太大
+  warmup_iter: 5000
+
+  # losses
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+
+# validation settings
+val:
+  val_freq: !!float 5e3
+  save_img: true
+
+  metrics:
+    PSNR:
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: true
+      better: higher
+    SSIM:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: true
+      better: higher
+
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 5e3
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
